@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/institute/static/css/main.6c10e670.css",
+    "main.js": "/institute/static/js/main.46dbfe1d.js",
+    "static/js/453.ec78f82d.chunk.js": "/institute/static/js/453.ec78f82d.chunk.js",
+    "static/media/Restaurant_Näsinneula.jpg": "/institute/static/media/Restaurant_Näsinneula.abb4d9a0e8c7957f284a.jpg",
+    "static/media/logo.svg": "/institute/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/institute/index.html",
+    "main.6c10e670.css.map": "/institute/static/css/main.6c10e670.css.map",
+    "main.46dbfe1d.js.map": "/institute/static/js/main.46dbfe1d.js.map",
+    "453.ec78f82d.chunk.js.map": "/institute/static/js/453.ec78f82d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6c10e670.css",
+    "static/js/main.46dbfe1d.js"
+  ]
+}
