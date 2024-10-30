@@ -1,0 +1,257 @@
+# register_lambda.py
+import json
+import boto3
+import uuid
+from datetime import datetime
+from botocore.exceptions import ClientError
+
+stepfunctions = boto3.client('stepfunctions')
+dynamodb = boto3.resource('dynamodb')
+waitlist_table = dynamodb.Table('Waitlist')
+
+def register_handler(event, context):
+    """
+    Lambda handler para el endpoint POST /waitlist
+    Inicia el proceso de registro mediante Step Functions
+    """
+    try:
+        body = json.loads(event['body'])
+        
+        # Validación básica
+        required_fields = ['name', 'email', 'groupSize']
+        if not all(field in body for field in required_fields):
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'Missing required fields'})
+            }
+            
+        # Preparar datos para Step Functions
+        execution_input = {
+            'userId': str(uuid.uuid4()),
+            'name': body['name'],
+            'email': body['email'],
+            'groupSize': body['groupSize'],
+            'status': 'PENDING',
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        # Iniciar Step Functions
+        response = stepfunctions.start_execution(
+            stateMachineArn='arn:aws:states:REGION:ACCOUNT:stateMachine:WaitlistRegistration',
+            input=json.dumps(execution_input)
+        )
+        
+        return {
+            'statusCode': 202,
+            'body': json.dumps({
+                'message': 'Registration in process',
+                'executionArn': response['executionArn']
+            })
+        }
+        
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
+
+# query_waitlist_lambda.py
+def query_waitlist_handler(event, context):
+    """
+    Lambda handler para el endpoint GET /waitlist
+    Consulta la lista de espera en DynamoDB
+    """
+    try:
+        # Obtener parámetros de consulta
+        params = event.get('queryStringParameters', {}) or {}
+        status = params.get('status', 'PENDING')
+        
+        # Consultar DynamoDB
+        response = waitlist_table.scan(
+            FilterExpression='#status = :status',
+            ExpressionAttributeNames={'#status': 'status'},
+            ExpressionAttributeValues={':status': status}
+        )
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps(response['Items'])
+        }
+        
+    except ClientError as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
+
+# tables_lambda.py
+def available_tables_handler(event, context):
+    """
+    Lambda handler para el endpoint GET /tables
+    Consulta las mesas disponibles
+    """
+    tables_table = dynamodb.Table('Tables')
+    
+    try:
+        response = tables_table.scan(
+            FilterExpression='#status = :status',
+            ExpressionAttributeNames={'#status': 'status'},
+            ExpressionAttributeValues={':status': 'AVAILABLE'}
+        )
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps(response['Items'])
+        }
+        
+    except ClientError as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
+
+# notify_customer_lambda.py
+def notify_customer_handler(event, context):
+    """
+    Lambda handler para el endpoint POST /notify
+    Envía notificación a través de SNS
+    """
+    sns = boto3.client('sns')
+    
+    try:
+        body = json.loads(event['body'])
+        user_id = body['userId']
+        message = body['message']
+        
+        # Obtener información del usuario
+        user = waitlist_table.get_item(
+            Key={'userId': user_id}
+        )['Item']
+        
+        # Publicar mensaje en SNS
+        response = sns.publish(
+            TopicArn='arn:aws:sns:REGION:ACCOUNT:NotificationsTopic',
+            Message=json.dumps({
+                'email': user['email'],
+                'message': message,
+                'type': 'NOTIFICATION'
+            })
+        )
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'messageId': response['MessageId']})
+        }
+        
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
+
+# email_processor_lambda.py
+def process_email(event, context):
+    """
+    Lambda handler para procesar mensajes de SQS y enviar emails
+    """
+    ses = boto3.client('ses')
+    
+    for record in event['Records']:
+        try:
+            message = json.loads(record['body'])
+            email_data = json.loads(message['Message'])
+            
+            # Enviar email usando SES
+            response = ses.send_email(
+                Source='noreply@turestaurante.com',
+                Destination={
+                    'ToAddresses': [email_data['email']]
+                },
+                Message={
+                    'Subject': {
+                        'Data': 'Actualización de Lista de Espera'
+                    },
+                    'Body': {
+                        'Text': {
+                            'Data': email_data['message']
+                        }
+                    }
+                }
+            )
+            
+        except Exception as e:
+            # Los mensajes fallidos irán a DLQ automáticamente
+            print(f"Error processing message: {str(e)}")
+            raise
+
+# step_functions_tasks.py
+def validate_input(event, context):
+    """
+    Lambda para Step Functions - Validación de datos
+    """
+    required_fields = ['userId', 'name', 'email', 'groupSize']
+    
+    if not all(field in event for field in required_fields):
+        raise ValueError("Missing required fields")
+        
+    if not '@' in event['email']:
+        raise ValueError("Invalid email format")
+        
+    if event['groupSize'] <= 0:
+        raise ValueError("Invalid group size")
+        
+    return event
+
+def save_to_dynamo(event, context):
+    """
+    Lambda para Step Functions - Guardar en DynamoDB
+    """
+    try:
+        waitlist_table.put_item(Item=event)
+        return event
+    except Exception as e:
+        raise Exception(f"Error saving to DynamoDB: {str(e)}")
+
+def send_confirmation(event, context):
+    """
+    Lambda para Step Functions - Enviar confirmación
+    """
+    sns = boto3.client('sns')
+    
+    try:
+        response = sns.publish(
+            TopicArn='arn:aws:sns:REGION:ACCOUNT:NotificationsTopic',
+            Message=json.dumps({
+                'email': event['email'],
+                'message': f"Hola {event['name']}, has sido registrado en la lista de espera.",
+                'type': 'CONFIRMATION'
+            })
+        )
+        return event
+    except Exception as e:
+        raise Exception(f"Error sending confirmation: {str(e)}")
+
+def compensating_transaction(event, context):
+    """
+    Lambda para Step Functions - Compensación en caso de error
+    """
+    try:
+        # Eliminar registro de DynamoDB si existe
+        waitlist_table.delete_item(
+            Key={'userId': event['userId']}
+        )
+        
+        # Enviar notificación de error
+        sns = boto3.client('sns')
+        sns.publish(
+            TopicArn='arn:aws:sns:REGION:ACCOUNT:NotificationsTopic',
+            Message=json.dumps({
+                'email': event['email'],
+                'message': "Lo sentimos, hubo un error en tu registro. Por favor intenta nuevamente.",
+                'type': 'ERROR'
+            })
+        )
+        
+    except Exception as e:
+        print(f"Error in compensating transaction: {str(e)}")
+        # No re-lanzamos la excepción para evitar un loop

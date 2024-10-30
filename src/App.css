@@ -1,6 +1,19 @@
 .App {
   text-align: center;
+  background-color: aliceblue;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
 }
+.formContainer{
+  display: flex;
+  width: 30%;
+  align-items: start;
+  justify-content: start;
+
+}
+
 
 .App-logo {
   height: 40vmin;
@@ -12,10 +25,39 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+.overlay{
+  background-color: rgba(0, 0, 0, 0.463);
+  position: absolute;
+  width: 100%;
+  height: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white !important;
+  
+}
 
-.App-header {
+.mainContainer{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 50%;
   background-color: #282c34;
-  min-height: 100vh;
+  color: aliceblue;
+}
+
+.header {
+  background-color: #282c34;
+  height: 50%;
+  width: 100%;
+  background-image: url('assets/Restaurant_Näsinneula.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,4 +77,351 @@
   to {
     transform: rotate(360deg);
   }
+}
+/* Formulario.css */
+
+/* Contenedor del formulario */
+.formulario {
+  margin-left: 50px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+}
+
+/* Título del formulario */
+.formulario h2 {
+  text-align: center;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Estilos para etiquetas */
+.formulario label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Estilos para campos de entrada de texto */
+.formulario input[type="text"],
+.formulario input[type="email"],
+.formulario textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1em;
+  color: #495057;
+  background-color: #fff;
+}
+
+/* Estilo de hover para inputs */
+.formulario input[type="text"]:hover,
+.formulario input[type="email"]:hover,
+.formulario textarea:hover {
+  border-color: #80bdff;
+  background-color: #e9f5ff;
+}
+
+/* Estilos para el botón */
+.formulario button {
+  width: 100%;
+  padding: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover y estado activo del botón */
+.formulario button:hover {
+  background-color: #0056b3;
+}
+
+.formulario button:active {
+  background-color: #004085;
+}
+
+/* Mensaje de error */
+.error {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+/* Mensaje de éxito */
+.success {
+  text-align: center;
+  color: #28a745;
+  font-weight: bold;
+  font-size: 1em;
+  margin-top: 15px;
+}
+
+
+/* styles.css */
+
+/* Contenedor principal */
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  background-color: #b3b7bd;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  color: #282c34;
+  
+}
+
+/* Títulos */
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Lista de grupos */
+.list-group {
+  list-style-type: none;
+  padding: 0;
+}
+
+.list-group-item {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list-group-item:hover {
+  background-color: #f8f9fa; /* Color al pasar el mouse */
+}
+
+/* Estilo de badges */
+.badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  color: #fff;
+}
+
+.bg-success {
+  background-color: #28a745;
+}
+
+.bg-danger {
+  background-color: #dc3545;
+}
+
+/* Botones */
+.btn {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.btn-primary {
+  background-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.checkingContainer{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  width: 80%;
+}
+
+
+
+/* styles.css */
+.waitlist-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  min-width: 300px;
+  min-height: 300px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Formulario */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.input-error {
+  border-color: #ff4444;
+}
+
+.error-message {
+  color: #ff4444;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.button:hover {
+  background: #0056b3;
+}
+
+.button.secondary {
+  background: #6c757d;
+}
+
+.button.secondary:hover {
+  background: #545b62;
+}
+
+/* Lista de espera */
+.waitlist {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.customer-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.customer-info h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.customer-info p {
+  margin: 5px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Mesas */
+.tables {
+  display: grid;
+  gap: 10px;
+}
+
+.table-card {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.table-card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.table-card p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.status {
+  font-weight: bold;
+}
+
+.status.available {
+  color: #28a745;
+}
+
+.status.occupied {
+  color: #dc3545;
+}
+
+/* Notificaciones */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 4px;
+  color: white;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.notification.success {
+  background: #28a745;
+}
+
+.notification.error {
+  background: #dc3545;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+input::placeholder {
+  color: #999;
 }
